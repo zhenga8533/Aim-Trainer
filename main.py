@@ -3,11 +3,11 @@ import pygame
 import settings
 
 # Constants
-BLACK = (0, 0, 0)
 GRAY = (50, 50, 50)
 LIGHT_GRAY = (128, 128, 128)
 WHITE = (255, 255, 255)
 RED = (255, 0, 0)
+GOLD = (255, 215, 0)
 
 
 class Target:
@@ -15,12 +15,14 @@ class Target:
         self.radius = settings.TARGET_RADIUS
         self.x = random.randint(self.radius, settings.SCREEN_WIDTH - self.radius)
         self.y = random.randint(self.radius + settings.STATUS_HEIGHT, settings.SCREEN_HEIGHT - self.radius)
+        self.value = 1 if random.randint(1, 10) != 1 else 5
+        self.color = RED if self.value == 1 else GOLD
 
     def update(self, screen):
         self.radius -= settings.TARGET_SHRINK
-        pygame.draw.circle(screen, RED, (self.x, self.y), self.radius)
+        pygame.draw.circle(screen, self.color, (self.x, self.y), self.radius)
         pygame.draw.circle(screen, WHITE, (self.x, self.y), self.radius * 2 / 3)
-        pygame.draw.circle(screen, RED, (self.x, self.y), self.radius / 3)
+        pygame.draw.circle(screen, self.color, (self.x, self.y), self.radius / 3)
         return self.radius > 0
 
 
@@ -55,8 +57,8 @@ if __name__ == '__main__':
                     x_diff = abs(event.pos[0] - target.x)
                     y_diff = abs(event.pos[1] - target.y)
                     if x_diff < target.radius and y_diff < target.radius:
+                        score += target.value
                         targets.remove(target)
-                        score += 1
                         break
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
