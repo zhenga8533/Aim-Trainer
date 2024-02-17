@@ -33,7 +33,7 @@ class Target {
      * @param {Target[]} targets 
      */
     constructor() {
-        this.radius = 20;
+        this.radius = 25;
         this.x = Math.random() * (WIDTH - 2 * this.radius) + this.radius;
         this.y = Math.random() * (HEIGHT - 2 * this.radius) + this.radius;
         this.color = 'red';
