@@ -3,7 +3,7 @@
  */
 const targets = [];
 let ticks = 0;
-let lives = 100;
+let lives = 0;
 let score = 0;
 let paused = false;
 let start = false;
@@ -83,12 +83,27 @@ class Target {
     }
 }
 
+/**
+ * Resets all variables to default and registers tick interval.
+ */
 function startGame() {
     document.getElementById("start").style.display = "none";
+    document.getElementById("end").style.display = "none";
+    targets.length = 0;
+    ticks = 0;
+    lives = 100;
+    score = 0;
+    paused = false;
+    start = true;
+    end = false;
     tick = setInterval(() => {
         if (!paused) updateGame();
     }, 50);
-    start = true;
+}
+
+function endGame() {
+    clearInterval(tick);
+    document.getElementById("end").style.display = "block";
 }
 
 /**
@@ -108,7 +123,7 @@ function updateGame() {
     });
 
     // End game when lives run out
-    if (lives <= 0) clearInterval(tick);
+    if (lives <= 0) endGame();
 
     // Update stats display
     const time = (ticks++) / 20;
@@ -119,42 +134,10 @@ function updateGame() {
 }
 
 /**
- * Register mouse event and game start listeners.
- */
-const startButton = document.getElementById("start");
-startButton.addEventListener('click', () => {
-    if (!start) startGame();
-});
-
-canvas.addEventListener('click', event => {
-    if (!start) startGame();
-    if (paused) return;
-
-    // Check pos of mouse click
-    const rect = canvas.getBoundingClientRect();
-    const mouseX = event.clientX - rect.left;
-    const mouseY = event.clientY - rect.top;
-
-    // Check if any target was clicked on
-    targets.forEach(target => {
-        const dx = mouseX - target.x;
-        const dy = mouseY - target.y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-        if (distance < target.radius) target.onClick();
-    });
-});
-
-/**
  * Register mouse listener.
  */
 canvas.addEventListener('click', event => {
-    if (!start) {
-        document.getElementById("start").style.display = "none";
-        tick = setInterval(() => {
-            if (!paused) updateGame();
-        }, 50);
-        start = true;
-    }
+    if (!start) startGame();
     if (paused) return;
 
     // Check pos of mouse click
@@ -176,4 +159,11 @@ canvas.addEventListener('click', event => {
  */
 document.addEventListener('keydown', event => {
     if (event.key === 'p') paused = !paused;
+    switch (event.key) {
+        case 'p':
+            paused = !paused;
+            break;
+        case 'r':
+            break;
+    }
 });
