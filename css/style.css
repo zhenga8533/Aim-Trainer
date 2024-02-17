@@ -15,8 +15,15 @@ header {
     color: white;
     height: 10vh;
     padding: 0 1rem;
+    font-weight: 500;
 }
 
+canvas {
+    position: relative;
+}
+
+
+/* Header stats styling */
 #stats {
     display: flex;
     align-items: center;
@@ -49,7 +56,6 @@ header {
     left: 26rem;
 }
 
-canvas {
-    height: 88vh;
-    position: relative;
+#logo {
+    font-size: x-large;
 }
