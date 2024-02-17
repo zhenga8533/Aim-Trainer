@@ -18,10 +18,6 @@ header {
     font-weight: 500;
 }
 
-canvas {
-    position: relative;
-}
-
 
 /* Header stats styling */
 #stats {

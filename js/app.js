@@ -14,9 +14,10 @@ const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext('2d');
 canvas.style.width = WIDTH + "px";
 canvas.style.height = HEIGHT + "px";
-var scale = window.devicePixelRatio; // <--- Change to 1 on retina screens to see blurry canvas.
+const scale = window.devicePixelRatio;
 canvas.width = WIDTH * scale;
 canvas.height = HEIGHT * scale;
+console.log(canvas.width);
 
 // Normalize coordinate system to use css pixels.
 ctx.imageSmoothingEnabled = false;
@@ -29,11 +30,10 @@ class Target {
      */
     constructor() {
         this.radius = 10;
-        this.x = (canvas.width - 2 * this.radius) * Math.random() + this.radius;
-        this.y = (canvas.height - 2 * this.radius) * Math.random() + this.radius + HEADER_HEIGHT;
+        this.x = Math.random() * (WIDTH - 2 * this.radius) + this.radius;
+        this.y = Math.random() * (HEIGHT - 2 * this.radius) + this.radius;
         this.color = 'red';
         targets.push(this);
-        
         this.draw();
     }
 
@@ -48,13 +48,13 @@ class Target {
         score++;
         const index = targets.indexOf(this);
         targets.splice(index, 1);
-        ctx.clearRect(this.x - this.radius, this.y - this.radius, this.radius * 2, this.radius * 2);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
         targets.forEach(target => target.draw());
     }
 }
 
 function updateGame() {
-    // Create new targets
+    // Create new targets 7
     if (ticks % 7 === 0) {
         new Target(targets)
     }
