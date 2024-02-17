@@ -17,7 +17,6 @@ canvas.style.height = HEIGHT + "px";
 const scale = window.devicePixelRatio;
 canvas.width = WIDTH * scale;
 canvas.height = HEIGHT * scale;
-console.log(canvas.width);
 
 // Normalize coordinate system to use css pixels.
 ctx.imageSmoothingEnabled = false;
@@ -29,17 +28,39 @@ class Target {
      * @param {Target[]} targets 
      */
     constructor() {
-        this.radius = 10;
+        this.radius = 20;
         this.x = Math.random() * (WIDTH - 2 * this.radius) + this.radius;
         this.y = Math.random() * (HEIGHT - 2 * this.radius) + this.radius;
         this.color = 'red';
         targets.push(this);
-        this.draw();
+        this.update();
     }
 
+    update() {
+        this.radius -= 0.05;
+        if (this.radius <= 0) {
+            const index = targets.indexOf(this);
+            targets.splice(index, 1);
+            lives--;
+        } else this.draw();
+    }
+
+    /**
+     * Draws target onto canvas.
+     */
     draw() {
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = this.color;
+        ctx.fill();
+        
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius * 2 / 3, 0, Math.PI * 2);
+        ctx.fillStyle = 'white';
+        ctx.fill();
+        
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius / 3, 0, Math.PI * 2);
         ctx.fillStyle = this.color;
         ctx.fill();
     }
@@ -48,16 +69,21 @@ class Target {
         score++;
         const index = targets.indexOf(this);
         targets.splice(index, 1);
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        targets.forEach(target => target.draw());
     }
 }
 
 function updateGame() {
     // Create new targets 7
     if (ticks % 7 === 0) {
-        new Target(targets)
+        new Target(targets);
     }
+
+    // Redraw board
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    targets.forEach(target => {
+        target.radius -= 0.1;
+        target.update();
+    });
 
     // Update stats display
     const time = (ticks++) / 20;
@@ -68,7 +94,7 @@ function updateGame() {
 }
 
 const tick = setInterval(() => {
-    updateGame()
+    updateGame();
 }, 50);
 
 canvas.addEventListener('click', function (event) {
