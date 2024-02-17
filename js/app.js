@@ -1,10 +1,12 @@
 /**
- * Initialize game.
+ * Initialize global game variables.
  */
+const targets = [];
 let ticks = 0;
 let lives = 100;
 let score = 0;
-const targets = [];
+let paused = false;
+let end = false;
 
 // Set canvas size and rendering
 const HEADER_HEIGHT = window.innerHeight * 0.1;
@@ -24,6 +26,7 @@ ctx.scale(scale, scale);
 
 class Target {
     /**
+     * Target object.
      * 
      * @param {Target[]} targets 
      */
@@ -36,6 +39,9 @@ class Target {
         this.update();
     }
 
+    /**
+     * Shrink target and redraw every tick. Removes any target with radius of 0.
+     */
     update() {
         this.radius -= 0.05;
         if (this.radius <= 0) {
@@ -65,6 +71,9 @@ class Target {
         ctx.fill();
     }
 
+    /**
+     * Removes target when clicked on.
+     */
     onClick() {
         score++;
         const index = targets.indexOf(this);
@@ -72,8 +81,11 @@ class Target {
     }
 }
 
+/**
+ * Function to update t
+ */
 function updateGame() {
-    // Create new targets 7
+    // Create new targets every 7 ticks (350ms)
     if (ticks % 7 === 0) {
         new Target(targets);
     }
@@ -85,6 +97,9 @@ function updateGame() {
         target.update();
     });
 
+    // End game when lives run out
+    if (lives <= 0) clearInterval(tick);
+
     // Update stats display
     const time = (ticks++) / 20;
     document.getElementById("time").innerText = time.toFixed(0);
@@ -93,22 +108,33 @@ function updateGame() {
     document.getElementById("score").innerText = score;
 }
 
-const tick = setInterval(() => {
-    updateGame();
+let tick = setInterval(() => {
+    if (!paused) updateGame();
 }, 50);
 
-canvas.addEventListener('click', function (event) {
-    let rect = canvas.getBoundingClientRect();
-    let mouseX = event.clientX - rect.left;
-    let mouseY = event.clientY - rect.top;
+/**
+ * Register mouse listener.
+ */
+canvas.addEventListener('click', event => {
+    if (paused) return;
 
-    targets.forEach(function (target) {
-        let dx = mouseX - target.x;
-        let dy = mouseY - target.y;
-        let distance = Math.sqrt(dx * dx + dy * dy);
+    // Check pos of mouse click
+    const rect = canvas.getBoundingClientRect();
+    const mouseX = event.clientX - rect.left;
+    const mouseY = event.clientY - rect.top;
 
-        if (distance < target.radius) {
-            target.onClick();
-        }
+    // Check if any target was clicked on
+    targets.forEach(target => {
+        const dx = mouseX - target.x;
+        const dy = mouseY - target.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        if (distance < target.radius) target.onClick();
     });
+});
+
+/**
+ * Register keyboard listener.
+ */
+document.addEventListener('keydown', event => {
+    if (event.key === 'p') paused = !paused;
 });
