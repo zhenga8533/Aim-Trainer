@@ -6,7 +6,9 @@ let ticks = 0;
 let lives = 100;
 let score = 0;
 let paused = false;
+let start = false;
 let end = false;
+let tick = undefined;
 
 // Set canvas size and rendering
 const HEADER_HEIGHT = window.innerHeight * 0.1;
@@ -81,6 +83,14 @@ class Target {
     }
 }
 
+function startGame() {
+    document.getElementById("start").style.display = "none";
+    tick = setInterval(() => {
+        if (!paused) updateGame();
+    }, 50);
+    start = true;
+}
+
 /**
  * Function to update t
  */
@@ -108,14 +118,43 @@ function updateGame() {
     document.getElementById("score").innerText = score;
 }
 
-let tick = setInterval(() => {
-    if (!paused) updateGame();
-}, 50);
+/**
+ * Register mouse event and game start listeners.
+ */
+const startButton = document.getElementById("start");
+startButton.addEventListener('click', () => {
+    if (!start) startGame();
+});
+
+canvas.addEventListener('click', event => {
+    if (!start) startGame();
+    if (paused) return;
+
+    // Check pos of mouse click
+    const rect = canvas.getBoundingClientRect();
+    const mouseX = event.clientX - rect.left;
+    const mouseY = event.clientY - rect.top;
+
+    // Check if any target was clicked on
+    targets.forEach(target => {
+        const dx = mouseX - target.x;
+        const dy = mouseY - target.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        if (distance < target.radius) target.onClick();
+    });
+});
 
 /**
  * Register mouse listener.
  */
 canvas.addEventListener('click', event => {
+    if (!start) {
+        document.getElementById("start").style.display = "none";
+        tick = setInterval(() => {
+            if (!paused) updateGame();
+        }, 50);
+        start = true;
+    }
     if (paused) return;
 
     // Check pos of mouse click
